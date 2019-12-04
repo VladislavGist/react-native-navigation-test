@@ -4,16 +4,17 @@ import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 
 class HomeScreen extends React.Component {
-  static navigationOptions = ({navigation}) => ({
-    headerTitle: () => <LogoTitle />,
-    headerRight: () => (
-      <Button
-        onPress={navigation.getParam('increaseCount')}
-        title="+1"
-        color="#fff"
-      />
-    ),
-  });
+  static navigationOptions = ({navigation}) => {
+    return {
+      headerLeft: () => (
+        <Button
+          onPress={() => navigation.navigate('MyModal')}
+          title="Info"
+          color="black"
+        />
+      ),
+    };
+  };
 
   state = {
     count: 0,
@@ -45,18 +46,25 @@ class HomeScreen extends React.Component {
   }
 }
 
-class DetailsScreen extends React.Component {
-  static navigationOptions = ({navigation, navigationOptions}) => {
-    const {params} = navigation.state;
+class ModalScreen extends React.Component {
+  render() {
+    return (
+      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+        <Text style={{fontSize: 30}}>This is a modal!</Text>
+        <Button
+          title="back"
+          onPress={() => {
+            this.props.navigation.goBack();
+          }}
+        />
+      </View>
+    );
+  }
+}
 
-    return {
-      title: params ? params.otherParam : 'A Nested Details Screen',
-      /* These values are used instead of the shared configuration! */
-      headerStyle: {
-        backgroundColor: navigationOptions.headerTintColor,
-      },
-      headerTintColor: navigationOptions.headerStyle.backgroundColor,
-    };
+class DetailsScreen extends React.Component {
+  static navigationOptions = {
+    title: 'Details',
   };
 
   render() {
@@ -104,30 +112,24 @@ class LogoTitle extends React.Component {
   }
 }
 
-const AppNavigator = createStackNavigator(
+const MainStack = createStackNavigator({
+  Home: HomeScreen,
+  Details: DetailsScreen,
+});
+
+const RootStack = createStackNavigator(
   {
-    Home: HomeScreen,
-    Details: DetailsScreen,
+    Main: MainStack,
+    MyModal: ModalScreen,
   },
   {
-    initialRouteName: 'Home',
-    defaultNavigationOptions: {
-      headerStyle: {
-        backgroundColor: '#f4511e',
-      },
-      headerTintColor: '#fff',
-      headerTitleStyle: {
-        fontWeight: 'bold',
-        color: 'orange',
-      },
-    },
-    navigationOptions: {
-      tabBarLabel: 'Home!',
-    },
+    initialRouteName: 'Main',
+    mode: 'modal',
+    headerMode: 'none',
   },
 );
 
-const AppContainer = createAppContainer(AppNavigator);
+const AppContainer = createAppContainer(RootStack);
 
 export default class App extends React.Component {
   render() {
