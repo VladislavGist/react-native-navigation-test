@@ -1,138 +1,64 @@
 import React from 'react';
-import {Button, View, Text} from 'react-native';
+import {Text, View, Button} from 'react-native';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
-
-class HomeScreen extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerLeft: () => (
-        <Button
-          onPress={() => navigation.navigate('MyModal')}
-          title="Info"
-          color="black"
-        />
-      ),
-    };
-  };
-
-  state = {
-    count: 0,
-  };
-
-  componentDidMount() {
-    this.props.navigation.setParams({increaseCount: this._increaseCount});
-  }
-
-  _increaseCount = () => {
-    this.setState({count: this.state.count + 1});
-  };
-
-  render() {
-    return (
-      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-        <Text>Home Screen</Text>
-        <Button
-          title="Go to Details"
-          onPress={() =>
-            this.props.navigation.navigate('Details', {
-              itemId: 86,
-              otherParam: 'string text',
-            })
-          }
-        />
-      </View>
-    );
-  }
-}
-
-class ModalScreen extends React.Component {
-  render() {
-    return (
-      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-        <Text style={{fontSize: 30}}>This is a modal!</Text>
-        <Button
-          title="back"
-          onPress={() => {
-            this.props.navigation.goBack();
-          }}
-        />
-      </View>
-    );
-  }
-}
+import {createBottomTabNavigator} from 'react-navigation-tabs';
 
 class DetailsScreen extends React.Component {
-  static navigationOptions = {
-    title: 'Details',
-  };
-
   render() {
-    const {navigation} = this.props;
-
     return (
-      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-        <Text>Details Screen</Text>
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text>Details about {this.props.navigation.getParam('name')}</Text>
+      </View>
+    );
+  }
+}
 
-        <Text>
-          itemId: {JSON.stringify(navigation.getParam('itemId', 'NO-ID'))}
-        </Text>
-
-        <Text>
-          otherParam:
-          {JSON.stringify(navigation.getParam('otherParam', 'default value'))}
-        </Text>
-
+class HomeScreen extends React.Component {
+  render() {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text>Home</Text>
         <Button
-          title="Go to Details again"
+          title="Go to Details Home"
           onPress={() =>
-            this.props.navigation.push('Details', {
-              itemId: Math.floor(Math.random() * 100),
-            })
+            this.props.navigation.navigate('Details', {name: 'Mike'})
           }
-        />
-
-        <Button
-          title="Go to home"
-          onPress={() => this.props.navigation.popToTop()}
-        />
-
-        <Button
-          title="Go back"
-          onPress={() => this.props.navigation.goBack()}
         />
       </View>
     );
   }
 }
 
-class LogoTitle extends React.Component {
+class SettingsScreen extends React.Component {
   render() {
-    return <Text>***</Text>;
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text>Settings</Text>
+        <Button
+          title="Go to Details Settings"
+          onPress={() =>
+            this.props.navigation.navigate('Details', {name: 'John'})
+          }
+        />
+      </View>
+    );
   }
 }
 
-const MainStack = createStackNavigator({
+const HomeStack = createStackNavigator({
   Home: HomeScreen,
   Details: DetailsScreen,
 });
 
-const RootStack = createStackNavigator(
-  {
-    Main: MainStack,
-    MyModal: ModalScreen,
-  },
-  {
-    initialRouteName: 'Main',
-    mode: 'modal',
-    headerMode: 'none',
-  },
-);
+const SettingsStack = createStackNavigator({
+  Settings: SettingsScreen,
+  Details: DetailsScreen,
+});
 
-const AppContainer = createAppContainer(RootStack);
+const TabNavigator = createBottomTabNavigator({
+  Home: HomeStack,
+  Settings: SettingsStack,
+});
 
-export default class App extends React.Component {
-  render() {
-    return <AppContainer />;
-  }
-}
+export default createAppContainer(TabNavigator);
